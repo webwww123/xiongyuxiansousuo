@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Lock, Unlock, Eye, Radio, Activity, Search, Cpu, Fingerprint, AlertTriangle, Terminal } from 'lucide-react';
+import { Lock, Unlock, Eye, Radio, Activity, Search, Cpu, Fingerprint, AlertTriangle, Terminal, ArrowRight, ShieldAlert } from 'lucide-react';
 import MatrixRain from './components/MatrixRain';
 import CodeStream from './components/CodeStream';
 import Typewriter from './components/Typewriter';
@@ -17,6 +17,7 @@ const App: React.FC = () => {
   const [stage, setStage] = useState<Stage>(Stage.INTRO);
   const [inputValue, setInputValue] = useState('');
   const [logs, setLogs] = useState<string[]>([]);
+  const [interactionRequired, setInteractionRequired] = useState(false);
   const logsEndRef = useRef<HTMLDivElement>(null);
 
   // Scroll to bottom of logs
@@ -43,32 +44,61 @@ const App: React.FC = () => {
     e.preventDefault();
     if (!inputValue.trim()) return;
     setStage(Stage.PROCESSING);
-    processFakeData();
+    processFakeDataPart1();
   };
 
-  const processFakeData = async () => {
-    const fakeLogs = [
+  const processFakeDataPart1 = async () => {
+    setLogs([]);
+    setInteractionRequired(false);
+
+    const part1Logs = [
       "正在连接 Akashic (阿卡西) 记录...",
+      "正在建立量子纠缠通道...",
       `目标锁定: 熊雨贤 (XIONG_YUXIAN)`,
+      "分析脑波频率: 14.5 Hz (Beta波)",
       "正在暴力破解逻辑防火墙...",
+      "...",
+      "警告: 检测到潜意识防御机制",
+      "错误: 访问被拒绝 (错误代码: HUMAN_EMOTION_BLOCK)",
+      "需要人工干预以强制覆盖..."
+    ];
+
+    // 慢速生成日志
+    for (let i = 0; i < part1Logs.length; i++) {
+      await new Promise(resolve => setTimeout(resolve, 800));
+      setLogs(prev => [...prev, `> [SYSTEM]: ${part1Logs[i]}`]);
+    }
+
+    setInteractionRequired(true);
+  };
+
+  const handleOverride = async () => {
+    setInteractionRequired(false);
+    setLogs(prev => [...prev, `> [USER]: 授权强制覆盖指令...`]);
+    
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    const part2Logs = [
+      "授权确认: ADMIN_OVERRIDE_ENABLED",
+      "正在重新编译现实参数...",
       "绕过大脑皮层防御机制...",
       "ROOT ACCESS: ACQUIRED",
       "下载神经元记忆碎片 (42TB)...",
       "正在通过量子算法解析因果律...",
+      "解析中... [████████░░] 82%",
+      "解析中... [██████████] 100%",
       "警告: 检索到 1 个终极答案",
       "系统过载: 真相即将溢出",
       ">> 准备注入现实 <<"
     ];
 
-    // 快速生成日志
-    for (let i = 0; i < fakeLogs.length; i++) {
-      // 越往后越快
-      const delay = Math.max(50, 400 - i * 30);
+    for (let i = 0; i < part2Logs.length; i++) {
+      const delay = Math.max(150, 600 - i * 40);
       await new Promise(resolve => setTimeout(resolve, delay));
-      setLogs(prev => [...prev, `> [SYSTEM]: ${fakeLogs[i]}`]);
+      setLogs(prev => [...prev, `> [SYSTEM]: ${part2Logs[i]}`]);
     }
 
-    await new Promise(resolve => setTimeout(resolve, 600));
+    await new Promise(resolve => setTimeout(resolve, 1500));
     setStage(Stage.REDIRECT);
     
     setTimeout(() => {
@@ -176,13 +206,17 @@ const App: React.FC = () => {
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     placeholder="输入你的终极疑问..."
-                    className="block w-full bg-black border-2 border-green-800 text-green-300 p-6 text-xl md:text-2xl outline-none focus:border-green-400 focus:shadow-[0_0_30px_rgba(0,255,0,0.5)] transition-all duration-300 placeholder-green-900 text-center font-mono rounded-lg"
+                    className="block w-full bg-black border-2 border-green-800 text-green-300 p-6 pr-16 text-xl md:text-2xl outline-none focus:border-green-400 focus:shadow-[0_0_30px_rgba(0,255,0,0.5)] transition-all duration-300 placeholder-green-900 text-center font-mono rounded-lg"
                     autoFocus
                     autoComplete="off"
                     />
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-green-800 pointer-events-none">
-                        <Terminal className="w-6 h-6" />
-                    </div>
+                    <button 
+                        type="submit"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-green-900/40 border border-green-700 text-green-400 hover:bg-green-500 hover:text-black p-2 rounded-md transition-all duration-200 hover:shadow-[0_0_15px_rgba(0,255,0,0.6)] active:scale-95"
+                        aria-label="Execute Search"
+                    >
+                        <ArrowRight className="w-6 h-6 md:w-8 md:h-8" />
+                    </button>
                 </div>
                 <div className="mt-6 text-xs text-gray-500 flex justify-center items-center gap-2">
                    <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
@@ -197,27 +231,50 @@ const App: React.FC = () => {
             <div className="w-full h-screen fixed inset-0 z-50 bg-black flex flex-col items-center justify-center">
                 <CodeStream />
                 
-                <div className="z-50 w-full max-w-2xl p-4 bg-black/90 backdrop-blur-md border border-green-500/50 rounded-lg shadow-[0_0_50px_rgba(0,255,0,0.2)]">
+                <div className={`z-50 w-full max-w-2xl p-4 bg-black/90 backdrop-blur-md border ${interactionRequired ? 'border-red-500 shadow-[0_0_50px_rgba(255,0,0,0.4)]' : 'border-green-500/50 shadow-[0_0_50px_rgba(0,255,0,0.2)]'} rounded-lg transition-all duration-500`}>
                     <div className="flex items-center gap-4 mb-4 border-b border-green-900 pb-2">
-                        <Cpu className="w-6 h-6 animate-spin text-green-400" />
-                        <span className="text-lg md:text-xl font-bold animate-pulse text-green-400">CALCULATING TRUTH FOR: 熊雨贤</span>
+                        {interactionRequired ? (
+                             <ShieldAlert className="w-6 h-6 animate-pulse text-red-500" />
+                        ) : (
+                             <Cpu className="w-6 h-6 animate-spin text-green-400" />
+                        )}
+                        <span className={`text-lg md:text-xl font-bold animate-pulse ${interactionRequired ? 'text-red-500' : 'text-green-400'}`}>
+                            {interactionRequired ? "SECURITY ALERT: INTERVENTION REQUIRED" : "CALCULATING TRUTH FOR: 熊雨贤"}
+                        </span>
                     </div>
                     
                     <div className="h-64 overflow-hidden flex flex-col relative font-mono text-sm md:text-base">
                         <div className="flex-1 flex flex-col justify-end space-y-1 pb-2">
                             {logs.map((log, idx) => (
-                                <div key={idx} className="text-green-400/90 break-all animate-in slide-in-from-left-4 fade-in duration-100">
+                                <div key={idx} className={`${log.includes("警告") || log.includes("错误") ? "text-red-400" : "text-green-400/90"} break-all animate-in slide-in-from-left-4 fade-in duration-100`}>
                                     {log}
                                 </div>
                             ))}
                             <div ref={logsEndRef} />
                         </div>
+                        
+                        {/* Interaction Overlay */}
+                        {interactionRequired && (
+                            <div className="absolute inset-0 bg-black/85 flex flex-col items-center justify-center animate-in fade-in z-20 backdrop-blur-sm">
+                                <AlertTriangle className="w-16 h-16 text-red-500 mb-4 animate-bounce" />
+                                <p className="text-red-400 font-bold mb-6 text-center px-4 text-lg">
+                                  潜意识防御激活。<br/>需要手动确认以继续。
+                                </p>
+                                <button 
+                                    onClick={handleOverride}
+                                    className="group relative px-8 py-4 bg-red-900/20 border-2 border-red-500 text-red-500 hover:bg-red-600 hover:text-black transition-all duration-200 font-bold tracking-widest overflow-hidden rounded uppercase cursor-pointer"
+                                >
+                                    <span className="relative z-10">强制覆盖 (OVERRIDE)</span>
+                                    <div className="absolute inset-0 bg-red-500 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-out"></div>
+                                </button>
+                            </div>
+                        )}
                     </div>
                     
                     {/* Progress Bar */}
-                    <div className="w-full h-4 bg-green-950 mt-4 rounded border border-green-800 overflow-hidden relative">
+                    <div className={`w-full h-4 ${interactionRequired ? 'bg-red-950 border-red-800' : 'bg-green-950 border-green-800'} mt-4 rounded border overflow-hidden relative transition-colors duration-500`}>
                         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/diagmonds-light.png')] opacity-20"></div>
-                        <div className="h-full bg-green-500 animate-[loading_2s_ease-in-out_infinite] shadow-[0_0_20px_#0f0]"></div>
+                        <div className={`h-full ${interactionRequired ? 'bg-red-600 w-full animate-pulse' : 'bg-green-500 animate-[loading_2s_ease-in-out_infinite]'} shadow-[0_0_20px_${interactionRequired ? '#f00' : '#0f0'}]`}></div>
                     </div>
                 </div>
             </div>
