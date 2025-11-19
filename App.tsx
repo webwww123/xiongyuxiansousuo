@@ -292,7 +292,7 @@ const App: React.FC = () => {
                 </h1>
                 
                 <p className="text-xl md:text-3xl text-red-500 font-bold mb-12 animate-pulse text-center px-4">
-                    >> 警告: 正在为你揭示 [熊雨贤] 的终极答案...
+                    &gt;&gt; 警告: 正在为你揭示 [熊雨贤] 的终极答案...
                 </p>
                 
                 <div className="w-64 md:w-96 h-2 bg-gray-900 rounded-full overflow-hidden border border-red-900/50">
